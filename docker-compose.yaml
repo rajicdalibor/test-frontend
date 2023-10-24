@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  test-frontend:
+    build:
+      context: ./react-app
+      dockerfile: ./Dockerfile
+    platform: linux/amd64
+    ports:
+      - 3000:3000
+    environment:
+      REACT_APP_EXAMPLE_VARIABLE: Conperi
+      REACT_APP_AUTH_SERVER_URL: https://conperi.dev/auth
