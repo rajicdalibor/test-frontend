@@ -16,7 +16,7 @@ jobs:
     permissions:
       contents: 'read' # These permissions are required by the workflow.
       id-token: 'write' # 3️⃣
-    uses: '3AP-AG/reusable-workflows/.github/workflows/build-push-image-to-gar.yml' # 4️⃣
+    uses: '3AP-AG/reusable-workflows/.github/workflows/build-push-image-to-gar.yml@main' # 4️⃣
     with:
       docker_build_context: './react-app' # 5️⃣
       dockerfile_path: './react-app/Dockerfile'
