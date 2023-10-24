@@ -22,10 +22,6 @@ jobs:
         run: echo "DOCKER_TAG=$(node -e "console.log(require('./package.json').version);")-${{ github.run_number }}-$GITHUB_SHA"  >> $GITHUB_ENV
       - run: |-
           echo DOCKER_TAG:  $DOCKER_TAG
-      - run: |-
-          TZ=UTC git log -1 --date='format-local:%Y-%m-%dT%H:%M:%SZ' --pretty=format:'{"'branch'"':'"'$GITHUB_REF'"','"'commit'"':'{"'id'"':'"'%h'"','"'time'"':'"'%ad'"','"'url'"':'"'$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/%h'"}'} > ./src/git.json
-      - name: View git.json
-        run: cat ./src/git.json
 
       - name: Authenticate to GCP
         id: auth
