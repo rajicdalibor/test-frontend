@@ -1,18 +1,26 @@
-name: Docker Image CI
+name: Build and Publish Acme Service
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - 'develop' # the default branch
+      - 'feature/**' # 1️⃣
+      - 'bugfix/**'
+      - 'main/**'
+    paths:
+      - 'src/**' # 2️⃣
 
 jobs:
-
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file react-app/Dockerfile --tag test-test-frontend:$(date +%s)
+  build-publish-acme-service:
+    name: "Build & Publish Acme Service"
+    permissions:
+      contents: 'read' # These permissions are required by the workflow.
+      id-token: 'write' # 3️⃣
+    uses: '3AP-AG/reusable-workflows/.github/workflows/build-push-image-to-gar.yml' # 4️⃣
+    with:
+      docker_build_context: './react-app' # 5️⃣
+      dockerfile_path: './react-app/Dockerfile'
+      docker_image: 'gcr.io/gentle-presence-402608/test-test-frontend'
+      docker_image_label_title: 'test-test-frontend'
+      gcp_auth_service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
+      gcp_auth_workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-cloud-run/providers/gh-provider'
