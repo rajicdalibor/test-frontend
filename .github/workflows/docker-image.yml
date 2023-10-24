@@ -6,13 +6,9 @@ on:
       - develop
       - main
 
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
   PROJECT_ID: "gentle-presence-402608"
-  IMAGE: test-test-frontend
+  IMAGE: "test-test-frontend"
 
 jobs:
   publish-latest-image:
