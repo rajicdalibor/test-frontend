@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 python:3.7-alpine as build
+FROM node:16-alpine as builder
 
 WORKDIR /app
 
