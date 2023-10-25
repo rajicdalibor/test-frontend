@@ -12,25 +12,24 @@ env:
 
 jobs:
   publish-latest-image:
-    runs-on: ubuntu-latest
+    name: "Build & Publish Acme Service"
     permissions:
-      contents: 'read'
-      id-token: 'write'
-    steps:
-      - uses: '3AP-AG/reusable-workflows/.github/workflows/build-push-image-to-gar.yml:latest'
-        with:
-          docker_build_context: './src' # 5️⃣
-          dockerfile_path: './react-app/Dockerfile'
-          docker_image: 'gcr.io/gentle-presence-402608/test-test-frontend:latest'
-          docker_image_label_title: 'test-test-frontend'
-          gcp_auth_service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
-          gcp_auth_workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-cloud-run/providers/github'
+      contents: 'read' # These permissions are required by the workflow.
+      id-token: 'write' # 3️⃣
+    uses: '3AP-AG/reusable-workflows/.github/workflows/build-push-image-to-gar.yml'
+    with:
+      docker_build_context: './src' # 5️⃣
+      dockerfile_path: './react-app/Dockerfile'
+      docker_image: 'gcr.io/gentle-presence-402608/test-test-frontend:latest'
+      docker_image_label_title: 'test-test-frontend'
+      gcp_auth_service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
+      gcp_auth_workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-cloud-run/providers/github'
 
-      - name: Determine Docker Tag
-        run: echo "DOCKER_TAG=$(node -e "console.log(require('./package.json').version);")-${{ github.run_number }}-$GITHUB_SHA"  >> $GITHUB_ENV
-      - run: |-
-          echo DOCKER_TAG:  $DOCKER_TAG
-#
+#      - name: Determine Docker Tag
+#        run: echo "DOCKER_TAG=$(node -e "console.log(require('./package.json').version);")-${{ github.run_number }}-$GITHUB_SHA"  >> $GITHUB_ENV
+#      - run: |-
+#          echo DOCKER_TAG:  $DOCKER_TAG
+##
 #      - name: Authenticate to GCP
 #        id: auth
 #        uses: google-github-actions/auth@v0
