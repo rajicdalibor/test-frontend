@@ -15,7 +15,7 @@ FROM nginx:alpine
 
 COPY nginx.conf /etc/nginx/conf.d/configfile.template
 ENV PORT 3000
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 3000
 
 COPY nginx-entrypoint.sh /
