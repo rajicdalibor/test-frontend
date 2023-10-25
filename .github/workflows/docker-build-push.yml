@@ -43,10 +43,6 @@ on:
         type: string # valid values: 'min', 'max'
         required: false # default 'min' set by docker/build-push-action
 
-      # push args
-      registry_domain:
-        type: string
-        required: true
       push: # disable pushing the image. Runs this workflow's build steps without pushing, which allows it to be used to test docker builds correctly.
         type: boolean
         required: false
