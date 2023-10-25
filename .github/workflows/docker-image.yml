@@ -41,7 +41,7 @@ jobs:
       - name: Build
         run: |-
           docker build \react-app
-            .
+
 #
 #name: Build and Publish Acme Service
 #
