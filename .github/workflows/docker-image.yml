@@ -38,7 +38,11 @@ jobs:
           gcloud --quiet auth configure-docker europe-west6-docker.pkg.dev
       - run: |-
           gcloud config list
-
+      - name: Build
+        run: |-
+          docker build \
+            --build-arg AUTH_SERVER_URL=$AUTH_SERVER_URL \
+            .
 #
 #name: Build and Publish Acme Service
 #
