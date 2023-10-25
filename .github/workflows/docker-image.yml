@@ -1,74 +1,103 @@
-name: Publish Docker image on develop
-
-on:
-  push:
-    branches:
-      - develop
-      - main
-
-env:
-  PROJECT_ID: "gentle-presence-402608"
-  IMAGE: "test-test-frontend"
-
-jobs:
-  publish-latest-image:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Determine Docker Tag
-        run: echo "DOCKER_TAG=$(node -e "console.log(require('./package.json').version);")-${{ github.run_number }}-$GITHUB_SHA"  >> $GITHUB_ENV
-      - run: |-
-          echo DOCKER_TAG:  $DOCKER_TAG
-
-      - name: Authenticate to GCP
-        id: auth
-        uses: google-github-actions/auth@v0
-        with:
-          token_format: access_token
-          workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-pool/providers/github-action'
-          service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
-          access_token_lifetime: 600s
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
-      - name: Set up Credential Helper for Artifact Registry
-        run: |-
-          gcloud --quiet auth configure-docker europe-west6-docker.pkg.dev
-      - run: |-
-          gcloud config list
-      - name: Build
-        run: |-
-          docker build \react-app --tag "gcr.io/gentle-presence-402608/test-test-frontend:latest"
-      # Push the Docker image to Google Container Registry
-      - name: Publish
-        run: |-
-          docker push "gcr.io/gentle-presence-402608/test-test-frontend:latest"
-#
-#name: Build and Publish Acme Service
+#name: Publish Docker image on develop
 #
 #on:
 #  push:
 #    branches:
-#      - 'develop' # the default branch
-#      - 'feature/**' # 1️⃣
-#      - 'bugfix/**'
-#      - 'main/**'
-#    paths:
-#      - 'src/**' # 2️⃣
+#      - develop
+#      - main
+#
+#env:
+#  PROJECT_ID: "gentle-presence-402608"
+#  IMAGE: "test-test-frontend"
 #
 #jobs:
-#  build-publish-acme-service:
-#    name: "Build & Publish Acme Service"
+#  publish-latest-image:
+#    runs-on: ubuntu-latest
 #    permissions:
-#      contents: 'read' # These permissions are required by the workflow.
-#      id-token: 'write' # 3️⃣
-#    uses: '3AP-AG/reusable-workflows/.github/workflows/build-push-image-to-gar.yml' # 4️⃣
-#    with:
-#      docker_build_context: './react-app' # 5️⃣
-#      dockerfile_path: './react-app/Dockerfile'
-#      docker_image: 'gcr.io/gentle-presence-402608/test-test-frontend'
-#      docker_image_label_title: 'test-test-frontend'
-#      gcp_auth_service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
-#      gcp_auth_workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-cloud-run/providers/gh-provider'
+#      contents: 'read'
+#      id-token: 'write'
+#    uses: ./docker-build-push.yml
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Determine Docker Tag
+#        run: echo "DOCKER_TAG=$(node -e "console.log(require('./package.json').version);")-${{ github.run_number }}-$GITHUB_SHA"  >> $GITHUB_ENV
+#      - run: |-
+#          echo DOCKER_TAG:  $DOCKER_TAG
+#
+#      - name: Authenticate to GCP
+#        id: auth
+#        uses: google-github-actions/auth@v0
+#        with:
+#          token_format: access_token
+#          workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-pool/providers/github-action'
+#          service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
+#          access_token_lifetime: 600s
+#      - name: Set up Google Cloud SDK
+#        uses: google-github-actions/setup-gcloud@v0
+#      - name: Set up Credential Helper for Artifact Registry
+#        run: |-
+#          gcloud --quiet auth configure-docker europe-west6-docker.pkg.dev
+#      - run: |-
+#          gcloud config list
+#      - name: Build
+#        run: |-
+#          docker build \react-app --tag gcr.io/gentle-presence-402608/test-test-frontend:latest
+#      # Push the Docker image to Google Container Registry
+#      - name: Publish
+#        run: |-
+#          docker push "gcr.io/gentle-presence-402608/test-test-frontend:latest"
+##
+##name: Build and Publish Acme Service
+##
+##on:
+##  push:
+##    branches:
+##      - 'develop' # the default branch
+##      - 'feature/**' # 1️⃣
+##      - 'bugfix/**'
+##      - 'main/**'
+##    paths:
+##      - 'src/**' # 2️⃣
+##
+##jobs:
+##  build-publish-acme-service:
+##    name: "Build & Publish Acme Service"
+##    permissions:
+##      contents: 'read' # These permissions are required by the workflow.
+##      id-token: 'write' # 3️⃣
+##    uses: '3AP-AG/reusable-workflows/.github/workflows/build-push-image-to-gar.yml' # 4️⃣
+##    with:
+##      docker_build_context: './react-app' # 5️⃣
+##      dockerfile_path: './react-app/Dockerfile'
+##      docker_image: 'gcr.io/gentle-presence-402608/test-test-frontend'
+##      docker_image_label_title: 'test-test-frontend'
+##      gcp_auth_service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
+##      gcp_auth_workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-cloud-run/providers/gh-provider'
+
+
+name: Build and Publish Acme Service
+
+on:
+  push:
+    branches:
+      - 'develop' # the default branch
+      - 'feature/**' # 1️⃣
+      - 'bugfix/**'
+      - 'main'
+    paths:
+      - 'src/**' # 2️⃣
+
+jobs:
+  build-publish-acme-service:
+    name: "Build & Publish Acme Service"
+    permissions:
+      contents: 'read' # These permissions are required by the workflow.
+      id-token: 'write' # 3️⃣
+    uses: './.github/workflows/docker-build-push.yml' # 4️⃣
+    with:
+      docker_build_context: './src' # 5️⃣
+      dockerfile_path: './react-app/Dockerfile'
+      docker_image: 'gcr.io/gentle-presence-402608/test-test-frontend'
+      docker_image_label_title: 'test-test-frontend'
+      gcp_auth_service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
+      gcp_auth_workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-pool/providers/github-action'
