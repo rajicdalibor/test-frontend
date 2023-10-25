@@ -41,7 +41,10 @@ jobs:
       - name: Build
         run: |-
           docker build \react-app
-
+      # Push the Docker image to Google Container Registry
+      - name: Publish
+        run: |-
+          docker push "gcr.io/gentle-presence-402608/test-test-frontend:latest"
 #
 #name: Build and Publish Acme Service
 #
