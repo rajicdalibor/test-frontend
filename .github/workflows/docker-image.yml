@@ -80,10 +80,8 @@ name: Build and Publish Acme Service
 on:
   push:
     branches:
-      - 'develop' # the default branch
-      - 'feature/**' # 1️⃣
-      - 'bugfix/**'
-      - 'main'
+      - main
+
     paths:
       - 'src/**' # 2️⃣
 
