@@ -91,7 +91,7 @@ jobs:
     permissions:
       contents: 'read' # These permissions are required by the workflow.
       id-token: 'write' # 3️⃣
-    uses: './.github/workflows/docker-build-push.yml' # 4️⃣
+    uses: './docker-build-push.yml' # 4️⃣
     with:
       docker_build_context: './src' # 5️⃣
       dockerfile_path: './react-app/Dockerfile'
