@@ -12,49 +12,39 @@ env:
 
 jobs:
   publish-latest-image:
-    name: "Build & Publish Acme Service"
+    runs-on: ubuntu-latest
     permissions:
-      contents: "read"
-      id-token: "write"
-      packages: "write"
-    uses: "3AP-AG/reusable-workflows/.github/workflows/publish-helm-chart.yml@6bd1057b17bc2b07c96b920fd9b7da2ae88ab3fb"
-    with:
-      docker_build_context: './src' # 5️⃣
-      dockerfile_path: './react-app/Dockerfile'
-      docker_image: 'gcr.io/gentle-presence-402608/test-test-frontend:latest'
-      docker_image_label_title: 'test-test-frontend'
-      gcp_auth_service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
-      gcp_auth_workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-cloud-run/providers/github'
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Determine Docker Tag
+        run: echo "DOCKER_TAG=$(node -e "console.log(require('./package.json').version);")-${{ github.run_number }}-$GITHUB_SHA"  >> $GITHUB_ENV
+      - run: |-
+          echo DOCKER_TAG:  $DOCKER_TAG
 
-#      - name: Determine Docker Tag
-#        run: echo "DOCKER_TAG=$(node -e "console.log(require('./package.json').version);")-${{ github.run_number }}-$GITHUB_SHA"  >> $GITHUB_ENV
-#      - run: |-
-#          echo DOCKER_TAG:  $DOCKER_TAG
-##
-#      - name: Authenticate to GCP
-#        id: auth
-#        uses: google-github-actions/auth@v0
-#        with:
-#          token_format: access_token
-#          workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-cloud-run/providers/github'
-#          service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
-#          access_token_lifetime: 600s
-#      - name: Set up Google Cloud SDK
-#        uses: google-github-actions/setup-gcloud@v0
-#      - name: Set up Credential Helper for Artifact Registry
-#        run: |-
-#          gcloud --quiet auth configure-docker europe-west6-docker.pkg.dev
-#      - run: |-
-#          gcloud config list
-#      - name: Build
-#        run: |-
-#          docker build \react-app
-#            --tag "gcr.io/gentle-presence-402608/test-test-frontend:latest" \
-#
-#      # Push the Docker image to Google Container Registry
-#      - name: Publish
-#        run: |-
-#          docker push "gcr.io/gentle-presence-402608/test-test-frontend:latest"
+      - name: Authenticate to GCP
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          token_format: access_token
+          workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-cloud-run/providers/github'
+          service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
+          access_token_lifetime: 600s
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+      - name: Set up Credential Helper for Artifact Registry
+        run: |-
+          gcloud --quiet auth configure-docker europe-west6-docker.pkg.dev
+      - run: |-
+          gcloud config list
+      - name: Build
+        run: |-
+          docker build \react-app --tag "gcr.io/gentle-presence-402608/test-test-frontend:latest"
+      # Push the Docker image to Google Container Registry
+      - name: Publish
+        run: |-
+          docker push "gcr.io/gentle-presence-402608/test-test-frontend:latest"
 #
 #name: Build and Publish Acme Service
 #
