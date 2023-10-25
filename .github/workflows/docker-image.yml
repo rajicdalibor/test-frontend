@@ -42,7 +42,6 @@ jobs:
         run: |-
           docker build \
             --tag "gcr.io/gentle-presence-402608/test-test-frontend:latest" \
-            .    
 
       # Push the Docker image to Google Container Registry
       - name: Publish
