@@ -1,15 +1,15 @@
-#name: Publish Docker image on develop
-#
-#on:
-#  push:
-#    branches:
-#      - develop
-#      - main
-#
-#env:
-#  PROJECT_ID: "gentle-presence-402608"
-#  IMAGE: "test-test-frontend"
-#
+name: Publish Docker image on develop
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+
+env:
+  PROJECT_ID: "gentle-presence-402608"
+  IMAGE: "test-test-frontend"
+
 #jobs:
 #  publish-latest-image:
 #    runs-on: ubuntu-latest
@@ -74,16 +74,16 @@
 ##      gcp_auth_service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
 ##      gcp_auth_workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-cloud-run/providers/gh-provider'
 
-
-name: Build and Publish Acme Service
-
-on:
-  push:
-    branches:
-      - main
-
-    paths:
-      - 'src/**' # 2️⃣
+#
+#name: Build and Publish Acme Service
+#
+#on:
+#  push:
+#    branches:
+#      - main
+#
+#    paths:
+#      - 'src/**' # 2️⃣
 
 jobs:
   build-publish-acme-service:
