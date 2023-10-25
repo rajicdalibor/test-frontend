@@ -1,0 +1,112 @@
+# Build and push a Docker image to Google Artifact Registry.
+#
+# See the docs: /docs/docker-build-push-to-gar.md
+#
+# This is a reusable workflow. See: https://docs.github.com/en/actions/using-workflows/reusing-workflows
+#
+# Note re. action versioning:
+# GitHub recommends pinning actions to a commit SHA. To get a newer version, update the SHA.
+# Although we can reference a tag or branch, it is not recommended as the action may change without warning.
+
+on:
+  workflow_call:
+    inputs:
+
+      checkout:
+        type: boolean
+        required: false
+        default: true # make sure to run actions/checkout manually before this workflow, if set to false
+
+      # Args for configuring GCP Authentication
+      gcp_auth_service_account: # e.g. service-account-name@project-name-12345678.iam.gserviceaccount.com
+        type: string
+        required: true
+      gcp_auth_workload_identity_provider: # e.g. projects/123412341234/locations/global/workloadIdentityPools/POOL_NAME/providers/PROVIDER_NAME
+        type: string
+        required: true
+      gcp_auth_access_token_lifetime: # Can be safely left as-is for most cases; only need to increase if your build is very slow.
+        type: string
+        required: false
+        default: "900s" # 15m
+
+      # Args for configuring docker-build-push.
+      # These shadow docker-build-push's args 1:1, prefixed with 'docker_'. See that workflow for docs.
+      docker_dockerfile_path:
+        type: string
+        required: false # default set by docker-build-push
+      docker_build_context:
+        type: string
+        required: false # default set by docker-build-push
+      docker_image:
+        type: string
+        required: true
+      docker_label_title:
+        type: string
+        required: true
+      docker_label_vendor:
+        type: string
+        required: false # default set by docker-build-push
+      docker_use_buildx:
+        type: boolean
+        required: false # default set by docker-build-push
+      docker_cache:
+        type: boolean
+        required: false # default set by docker-build-push
+      docker_cache_mode:
+        type: string    # valid values: 'min', 'max'
+        required: false # default set by docker-build-push
+      docker_registry_domain:
+        type: string
+        required: true
+      docker_push:
+        type: boolean
+        required: false # default set by docker-build-push
+
+
+jobs:
+  build-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write' # Allow the token to be updated by actions. Req'd by 'google-github-actions/auth'
+    steps:
+
+      # Checking out the repo is required by some of the following steps.
+      # When the checkout action is run, it replaces any changes made to an existing checkout.
+      # To support in-CI changes, we can disable this step, and rely on a prior checkout run.
+      - name: 'Checkout'
+        if: ${{ inputs.checkout }}
+        uses: 'actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8' # v3.1.0
+
+      - id: 'gcp_auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@ef5d53e30bbcd8d0836f4288f5e50ff3e086997d' # v1.0.0
+        with:
+          access_token_lifetime: ${{ inputs.gcp_auth_access_token_lifetime }}
+          create_credentials_file: true # N.B.: actions/checkout is required if google-github-actions/auth.create_credentials_file is true
+          service_account: ${{ inputs.gcp_auth_service_account }}
+          token_format: access_token # must be "access_token" if GAR (or GCP)
+          workload_identity_provider: ${{ inputs.gcp_auth_workload_identity_provider }}
+
+      - name: 'Login Docker to Google Artifact Registry'
+        uses: 'docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a' # v2.1.0
+        with:
+          registry: ${{ inputs.docker_registry_domain }}
+          username: oauth2accesstoken # required by GCP
+          password: ${{ steps.gcp_auth.outputs.access_token }}
+
+      - name: 'Build and push the image'
+        uses: './.github/workflows/docker-build-push.yml'
+        with:
+          # We hoist docker-build-push args in this workflow, prefixed with 'docker_'
+          dockerfile_path:  ${{ inputs.docker_dockerfile_path }}
+          build_context:    ${{ inputs.docker_build_context }}
+          image:            ${{ inputs.docker_image }}
+          label_title:      ${{ inputs.docker_label_title }}
+          label_vendor:     ${{ inputs.docker_label_vendor }}
+          use_buildx:       ${{ inputs.docker_use_buildx }}
+          cache:            ${{ inputs.docker_cache }}
+          cache_mode:       ${{ inputs.docker_cache_mode }}
+          registry_domain:  ${{ inputs.docker_registry_domain }}
+          push:             ${{ inputs.docker_push }}
+          checkout:         false # we have to checkout earlier in the workflow to support google-github-actions/auth, so disable the inner checkout step

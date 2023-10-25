@@ -91,11 +91,11 @@ jobs:
     permissions:
       contents: 'read' # These permissions are required by the workflow.
       id-token: 'write' # 3️⃣
-    uses: "./.github/workflows/docker-build-push.yml"
+    uses: "./.github/workflows/docker-build-push-to-gar.yml"
     with:
-      build_context: './src' # 5️⃣
+      docker_build_context: './src' # 5️⃣
       dockerfile_path: './react-app/Dockerfile'
-      image: 'gcr.io/gentle-presence-402608/test-test-frontend'
-      label_title: 'test-test-frontend'
+      docker_image: 'gcr.io/gentle-presence-402608/test-test-frontend'
+      docker_image_label_title: 'test-test-frontend'
       gcp_auth_service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
       gcp_auth_workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-pool/providers/github-action'
