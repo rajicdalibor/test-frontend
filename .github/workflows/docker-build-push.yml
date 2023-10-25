@@ -15,8 +15,7 @@ on:
       # build args
       dockerfile_path:
         type: string
-        required: false
-        default: "./Dockerfile"
+        required: true
       build_context:
         type: string
         required: false
