@@ -97,5 +97,6 @@ jobs:
       dockerfile_path: './react-app/Dockerfile'
       docker_image: 'gcr.io/gentle-presence-402608/test-test-frontend'
       docker_label_title: 'test-test-frontend'
+      docker_registry_domain: 'eu.gcr.io'
       gcp_auth_service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
       gcp_auth_workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-actions-pool/providers/github-action'
