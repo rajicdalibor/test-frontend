@@ -31,13 +31,22 @@ jobs:
           workload_identity_provider: 'projects/999991794670/locations/global/workloadIdentityPools/github-wif-pool/providers/gh-pool-platform-wif-prvdr'
           service_account: 'dalibor@gentle-presence-402608.iam.gserviceaccount.com'
           access_token_lifetime: 600s
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
-      - name: Set up Credential Helper for Artifact Registry
-        run: |-
-          gcloud auth configure-docker europe-west6-docker.pkg.dev
-      - run: |-
-          gcloud config list
+
+
+
+      - name: 'Login Docker to Google Artifact Registry'
+        uses: 'docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a' # v2.1.0
+        with:
+          registry: 'gcr.io/gentle-presence-402608'
+          username: oauth2accesstoken # required by GCP
+          password: ${{ steps.auth.outputs.access_token }}
+#      - name: Set up Google Cloud SDK
+#        uses: google-github-actions/setup-gcloud@v0
+#      - name: Set up Credential Helper for Artifact Registry
+#        run: |-
+#          gcloud auth configure-docker europe-west6-docker.pkg.dev
+#      - run: |-
+#          gcloud config list
       - name: Build
         run: |-
           docker build \react-app --tag gcr.io/gentle-presence-402608/test-test-frontend:latest
