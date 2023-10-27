@@ -35,7 +35,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v0
       - name: Set up Credential Helper for Artifact Registry
         run: |-
-          gcloud --quiet auth configure-docker europe-west6-docker.pkg.dev
+          gcloud auth configure-docker europe-west6-docker.pkg.dev
       - run: |-
           gcloud config list
       - name: Build
